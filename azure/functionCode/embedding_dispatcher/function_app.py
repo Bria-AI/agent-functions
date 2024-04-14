@@ -22,7 +22,7 @@ app = func.FunctionApp()
 
 @app.function_name(name="embedding_dispatcher")
 @app.service_bus_queue_trigger(arg_name="message", queue_name=queue_name,
-                               connection="embeddingsDispacher") 
+                               connection="embeddingsDispatcher")
 def embedding_dispatcher(message: func.ServiceBusMessage):
     try:
         file_json_data = json.loads(message.get_body().decode('utf-8'))
