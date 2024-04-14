@@ -7,15 +7,12 @@ import os
 import io
 import sentry_sdk
 
-
 sentry_sdk.init(
     dsn="https://8a85874d4f547148fd2f7b7f9caf2f93@o417868.ingest.sentry.io/4505900165627904"
 )
 blob_path = os.environ.get("blob_path")
 queue_name = os.environ.get("queue_name")
 sb_ns_fqdn = os.environ.get("imageHandler__fullyQualifiedNamespace")
-
-
 
 app = func.FunctionApp()
 
@@ -31,9 +28,9 @@ def agent_image_embeddings_calculator(imageBlob: func.InputStream):
         img_embeddings = [clip_pipeline.run_on_image(pil_image)]
 
         sender(servicebus_namenpace_fqdn=sb_ns_fqdn,
-            queue_name=queue_name,
-            img_embeddings=img_embeddings
-            )
+               queue_name=queue_name,
+               img_embeddings=img_embeddings
+               )
     except Exception as e:
         sentry_sdk.capture_exception(e)
         raise
