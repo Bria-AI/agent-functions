@@ -24,6 +24,7 @@ def agent_image_embeddings_calculator(imageBlob: func.InputStream):
     try:
         image_bytes = imageBlob.read()
         pil_image = Image.open(io.BytesIO(image_bytes))
+        print(f"Read image from storage account")
         clip_pipeline = CLIPEmbedder()
         img_embeddings = [clip_pipeline.run_on_image(pil_image)]
 

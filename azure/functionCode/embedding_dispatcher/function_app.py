@@ -25,17 +25,20 @@ app = func.FunctionApp()
 def embedding_dispatcher(message: func.ServiceBusMessage):
     try:
         file_json_data = json.loads(message.get_body().decode('utf-8'))
+        print(f"Read data from queue")
         embeddings_uid = str(uuid.uuid4())
+        print(f"embeddings_uid: {embeddings_uid}")
         request_body = {
             "embeddings_base64": file_json_data,
             "embeddings_uid": embeddings_uid,
             "model_version": model_version,
             "api_token": api_token,
         }
-
+        
         if attribution_endpoint:
             response = requests.post(attribution_endpoint, json=request_body)
             if json.loads(response.content).get("statusCode") != 200:
+                print(f"API request failed with status code {response.status_code}: {response.text}")
                 raise Exception(f"API request failed with status code {response.status_code}: {response.text}")
             else:
                 print(f"Request body: {request_body}")

@@ -11,5 +11,6 @@ def sender(servicebus_namenpace_fqdn: str,queue_name: str ,img_embeddings: list[
     
     message = ServiceBusMessage(body=json.dumps(img_embeddings), content_type="application/json")
 
-# Send the message
+    # Send the message
     sender.send_messages(message)
+    print(f"send embeddings to service bus")
