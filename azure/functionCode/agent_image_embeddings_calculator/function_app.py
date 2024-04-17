@@ -18,11 +18,11 @@ app = func.FunctionApp()
 
 
 @app.function_name(name="imageHandler")
-@app.blob_trigger(arg_name="imageBlob", path=blob_path,
+@app.blob_trigger(arg_name="blob", path=blob_path,
                   connection="imageHandler")
-def agent_image_embeddings_calculator(imageBlob: func.InputStream):
+def agent_image_embeddings_calculator(blob: func.InputStream):
     try:
-        image_bytes = imageBlob.read()
+        image_bytes = blob.read()
         pil_image = Image.open(io.BytesIO(image_bytes))
         clip_pipeline = CLIPEmbedder()
         img_embeddings = [clip_pipeline.run_on_image(pil_image)]
@@ -33,4 +33,6 @@ def agent_image_embeddings_calculator(imageBlob: func.InputStream):
                )
     except Exception as e:
         sentry_sdk.capture_exception(e)
-        raise
+        raise Exception(f"Cannot process image {blob.name}")
+
+    logging.info(f"${blob.name} processed successfully")
