@@ -24,14 +24,27 @@ def agent_image_embeddings_calculator(blob: func.InputStream):
     try:
         image_bytes = blob.read()
         pil_image = Image.open(io.BytesIO(image_bytes))
-        print(f"Read image from storage account")
         clip_pipeline = CLIPEmbedder()
         img_embeddings = [clip_pipeline.run_on_image(pil_image)]
 
+        metadata = blob.metadata
+        api_token = metadata.get("api_token")
+        model_version = metadata.get("model_version")
+        if api_token and model_version:
+            message_body = {
+            'api_token': api_token,
+            'model_version': model_version,
+            'img_embeddings': img_embeddings
+            }
+        else:
+            message_body = {'img_embeddings': img_embeddings}
+        
+        print(message_body)
         sender(servicebus_namenpace_fqdn=sb_ns_fqdn,
-               queue_name=queue_name,
-               img_embeddings=img_embeddings
-               )
+            queue_name=queue_name,
+            message_body=message_body
+            )
+        print('embeddings have sent to queue')
     except Exception as e:
         sentry_sdk.capture_exception(e)
         raise Exception(f"Cannot process image {blob.name}")

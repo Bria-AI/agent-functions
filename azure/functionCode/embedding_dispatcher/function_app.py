@@ -29,12 +29,12 @@ def embedding_dispatcher(message: func.ServiceBusMessage):
         embeddings_uid = str(uuid.uuid4())
         print(f"embeddings_uid: {embeddings_uid}")
         request_body = {
-            "embeddings_base64": file_json_data,
+            "embeddings_base64": file_json_data.get('img_embeddings'),
             "embeddings_uid": embeddings_uid,
-            "model_version": model_version,
-            "api_token": api_token,
+            "model_version": file_json_data.get('model_version', model_version),
+            "api_token": file_json_data.get('api_token', api_token),
         }
-        
+
         if attribution_endpoint:
             response = requests.post(attribution_endpoint, json=request_body)
             if json.loads(response.content).get("statusCode") != 200:
