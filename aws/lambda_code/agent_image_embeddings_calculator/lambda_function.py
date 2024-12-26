@@ -33,7 +33,7 @@ def lambda_handler(event, context):
         # Extract the api_token if it exists
         api_token = metadata.get("api_token", os.environ.get("api_token"))
         model_version = metadata.get("model_version", os.environ.get("model_version"))
-        agent = metadata.get("agent", os.environ.get("agent"))
+        agent = metadata.get("agent", os.environ.get("api_token"))
         
         clip_pipeline = CLIPEmbedder()
         img_embeddings = [clip_pipeline.run_on_image(pil_img)]
@@ -49,6 +49,8 @@ def lambda_handler(event, context):
         
         if agent:
           message_body['agent'] = agent
+        
+        sentry_sdk.set_tag("agent", agent)
           
         sqs.send_message(QueueUrl=queue_url, MessageBody=json.dumps(message_body))
     except Exception as ex:

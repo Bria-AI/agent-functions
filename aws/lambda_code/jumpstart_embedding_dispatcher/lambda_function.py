@@ -45,6 +45,7 @@ def handler(event, context):
             if agent:
                 request_body['agent'] = agent
             
+            sentry_sdk.set_tag("agent", agent)
             # Make a POST request to the API Gateway
             if attribution_endpoint:
                 response = requests.post(attribution_endpoint, json=request_body)
